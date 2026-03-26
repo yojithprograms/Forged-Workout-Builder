@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FORGED — Smart Workout Generator</title>
+  <meta name="description" content="A deterministic workout engine that generates perfectly balanced, fatigue-aware training plans based on your exact inputs." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <nav>
+    <a class="nav-logo" href="#" onclick="showPage('home'); return false;">
+      <span class="nav-logo-dot"></span>FORGED
+    </a>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('home')">Home</button>
+      <button class="nav-tab" onclick="showPage('generate')">Generate</button>
+      <button class="nav-tab" onclick="showPage('daily')">Daily</button>
+      <button class="nav-tab" onclick="showPage('history')">History</button>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       LOADING OVERLAY
+  ============================================================ -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">FORGED</div>
+    <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+    <div class="loading-msg" id="loadingMsg">GENERATING YOUR PLAN...</div>
+  </div>
+
+  <!-- ============================================================
+       TOAST NOTIFICATIONS
+  ============================================================ -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main class="main">
+
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active">
+      <section class="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-eyebrow">Smart Workout Generator</div>
+        <h1 class="hero-title">
+          <span class="line"><span>TRAIN</span></span>
+          <span class="line"><span style="color:var(--lime);text-shadow:0 0 80px rgba(212,245,60,0.2)">SMARTER</span></span>
+          <span class="line"><span>EVERY DAY</span></span>
+        </h1>
+        <p class="hero-subtitle">
+          A deterministic workout engine that generates perfectly balanced,
+          fatigue-aware training plans based on your exact inputs.
+          No randomness. No guesswork.
+        </p>
+        <div class="hero-cta-row">
+          <button class="btn-hero" onclick="showPage('generate')">Build My Plan →</button>
+          <button class="btn-hero-ghost" onclick="showPage('daily')">Today's Workout</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-num">40+</div><div class="hero-stat-label">Exercises</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">Split Types</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">∞</div><div class="hero-stat-label">Combinations</div></div>
+        </div>
+        <!-- Scrolling ticker -->
+        <div class="hero-ticker">
+          <div class="hero-ticker-inner">
+            <span class="hero-ticker-item hl">FORGED</span>
+            <span class="hero-ticker-item">Push / Pull / Legs</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Upper / Lower</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Full Body</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Fatigue Tracking</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Hypertrophy</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Strength</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Daily Workout</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Streak Tracking</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item hl">FORGED</span>
+            <span class="hero-ticker-item">Push / Pull / Legs</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Upper / Lower</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Full Body</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Fatigue Tracking</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Hypertrophy</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Strength</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Daily Workout</span>
+            <span class="hero-ticker-item hl">●</span>
+            <span class="hero-ticker-item">Streak Tracking</span>
+            <span class="hero-ticker-item hl">●</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- GENERATE PAGE -->
+    <div id="page-generate" class="page">
+      <div class="gen-layout">
+
+        <!-- Sidebar -->
+        <aside class="gen-sidebar">
+          <div class="sidebar-title">Your Plan Setup</div>
+          <div class="step-list" id="stepList">
+            <div class="step-item active" data-step="0">
+              <div class="step-num">01</div>
+              <div class="step-text">
+                <div class="step-name">Training Days</div>
+                <div class="step-val" id="sv-days">—</div>
+              </div>
+            </div>
+            <div class="step-item locked" data-step="1">
+              <div class="step-num">02</div>
+              <div class="step-text">
+                <div class="step-name">Session Length</div>
+                <div class="step-val" id="sv-duration">—</div>
+              </div>
+            </div>
+            <div class="step-item locked" data-step="2">
+              <div class="step-num">03</div>
+              <div class="step-text">
+                <div class="step-name">Experience</div>
+                <div class="step-val" id="sv-level">—</div>
+              </div>
+            </div>
+            <div class="step-item locked" data-step="3">
+              <div class="step-num">04</div>
+              <div class="step-text">
+                <div class="step-name">Equipment</div>
+                <div class="step-val" id="sv-equipment">—</div>
+              </div>
+            </div>
+            <div class="step-item locked" data-step="4">
+              <div class="step-num">05</div>
+              <div class="step-text">
+                <div class="step-name">Intensity</div>
+                <div class="step-val" id="sv-intensity">—</div>
+              </div>
+            </div>
+            <div class="step-item locked" data-step="5">
+              <div class="step-num">06</div>
+              <div class="step-text">
+                <div class="step-name">Your Goal</div>
+                <div class="step-val" id="sv-goal">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-profile" id="sidebarProfile" style="display:none">
+            <div class="profile-label">Profile Summary</div>
+            <div id="profileItems"></div>
+          </div>
+        </aside>
+
+        <!-- Step panels + plan output -->
+        <div>
+          <div class="gen-content" id="genContent">
+
+            <!-- Step 0: Training Days -->
+            <div class="step-panel active" id="step-0">
+              <div class="step-badge">Step 01 / 06</div>
+              <h2 class="step-heading">HOW MANY DAYS?</h2>
+              <p class="step-desc">How many days per week can you train consistently? Be realistic — a plan you follow beats a perfect plan you don't.</p>
+              <div class="option-row">
+                <div class="opt" onclick="selectOpt(0,'days',1,this)"><div class="opt-big">1</div><div class="opt-label">day</div></div>
+                <div class="opt" onclick="selectOpt(0,'days',2,this)"><div class="opt-big">2</div><div class="opt-label">days</div></div>
+                <div class="opt" onclick="selectOpt(0,'days',3,this)"><div class="opt-big">3</div><div class="opt-label">days</div></div>
+                <div class="opt" onclick="selectOpt(0,'days',4,this)"><div class="opt-big">4</div><div class="opt-label">days</div></div>
+                <div class="opt" onclick="selectOpt(0,'days',5,this)"><div class="opt-big">5</div><div class="opt-label">days</div></div>
+                <div class="opt" onclick="selectOpt(0,'days',6,this)"><div class="opt-big">6</div><div class="opt-label">days</div></div>
+                <div class="opt" onclick="selectOpt(0,'days',7,this)"><div class="opt-big">7</div><div class="opt-label">days</div></div>
+              </div>
+              <div class="nav-btns">
+                <button class="btn btn-primary" id="btn-0" onclick="nextStep(1)" disabled>Next →</button>
+              </div>
+            </div>
+
+            <!-- Step 1: Session Duration -->
+            <div class="step-panel" id="step-1">
+              <div class="step-badge">Step 02 / 06</div>
+              <h2 class="step-heading">SESSION LENGTH</h2>
+              <p class="step-desc">How long can you spend per session? This determines how many exercises we include.</p>
+              <div class="slider-block">
+                <div class="slider-top">
+                  <div>
+                    <div class="slider-big" id="dur-display">60</div>
+                    <div class="slider-unit-label">MINUTES PER SESSION</div>
+                  </div>
+                </div>
+                <div class="slider-track">
+                  <input type="range" id="dur-slider" min="30" max="120" step="5" value="60"
+                    oninput="sliderChange('duration', this.value, 'dur-display', v => v + ' min')" />
+                  <div class="slider-minmax"><span>30 min</span><span>75 min</span><span>120 min</span></div>
+                </div>
+              </div>
+              <div class="nav-btns">
+                <button class="btn btn-ghost" onclick="nextStep(0)">← Back</button>
+                <button class="btn btn-primary" onclick="nextStep(2)">Next →</button>
+              </div>
+            </div>
+
+            <!-- Step 2: Experience Level -->
+            <div class="step-panel" id="step-2">
+              <div class="step-badge">Step 03 / 06</div>
+              <h2 class="step-heading">EXPERIENCE LEVEL</h2>
+              <p class="step-desc">Your training age affects exercise selection, complexity, and total weekly volume.</p>
+              <div class="card-row">
+                <div class="card-opt" onclick="selectOpt(2,'level','beginner',this)">
+                  <div class="card-opt-icon">🌱</div>
+                  <div class="card-opt-title">Beginner</div>
+                  <div class="card-opt-desc">Under 1 year of consistent training</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(2,'level','intermediate',this)">
+                  <div class="card-opt-icon">⚡</div>
+                  <div class="card-opt-title">Intermediate</div>
+                  <div class="card-opt-desc">1–3 years, know the main lifts</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(2,'level','advanced',this)">
+                  <div class="card-opt-icon">🔥</div>
+                  <div class="card-opt-title">Advanced</div>
+                  <div class="card-opt-desc">3+ years, structured programming</div>
+                </div>
+              </div>
+              <div class="nav-btns">
+                <button class="btn btn-ghost" onclick="nextStep(1)">← Back</button>
+                <button class="btn btn-primary" id="btn-2" onclick="nextStep(3)" disabled>Next →</button>
+              </div>
+            </div>
+
+            <!-- Step 3: Equipment -->
+            <div class="step-panel" id="step-3">
+              <div class="step-badge">Step 04 / 06</div>
+              <h2 class="step-heading">EQUIPMENT ACCESS</h2>
+              <p class="step-desc">What gear do you have? We'll only include exercises you can actually do.</p>
+              <div class="card-row">
+                <div class="card-opt" onclick="selectOpt(3,'equipment','bodyweight',this)">
+                  <div class="card-opt-icon">🤸</div>
+                  <div class="card-opt-title">Bodyweight Only</div>
+                  <div class="card-opt-desc">No equipment, home workouts</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(3,'equipment','dumbbell',this)">
+                  <div class="card-opt-icon">🏋️</div>
+                  <div class="card-opt-title">Dumbbells</div>
+                  <div class="card-opt-desc">Adjustable or fixed dumbbells</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(3,'equipment','barbell',this)">
+                  <div class="card-opt-icon">🔩</div>
+                  <div class="card-opt-title">Barbell + Dumbbells</div>
+                  <div class="card-opt-desc">Home gym setup</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(3,'equipment','full gym',this)">
+                  <div class="card-opt-icon">🏟️</div>
+                  <div class="card-opt-title">Full Gym</div>
+                  <div class="card-opt-desc">All machines and free weights</div>
+                </div>
+              </div>
+              <div class="nav-btns">
+                <button class="btn btn-ghost" onclick="nextStep(2)">← Back</button>
+                <button class="btn btn-primary" id="btn-3" onclick="nextStep(4)" disabled>Next →</button>
+              </div>
+            </div>
+
+            <!-- Step 4: Intensity & Recovery -->
+            <div class="step-panel" id="step-4">
+              <div class="step-badge">Step 05 / 06</div>
+              <h2 class="step-heading">INTENSITY & RECOVERY</h2>
+              <p class="step-desc">How hard do you push, and how well does your body bounce back between sessions?</p>
+              <div class="toggle-block">
+                <div class="toggle-row" onclick="toggleFailure()">
+                  <div class="toggle-info">
+                    <div class="toggle-title">Train to Failure</div>
+                    <div class="toggle-desc">Push every working set to complete muscular failure. Reduces volume slightly, maximizes intensity.</div>
+                  </div>
+                  <div class="toggle-switch" id="failure-switch"></div>
+                </div>
+              </div>
+              <div class="slider-block">
+                <div class="slider-top">
+                  <div>
+                    <div class="slider-big" id="int-display">Moderate</div>
+                    <div class="slider-unit-label">TRAINING INTENSITY</div>
+                  </div>
+                </div>
+                <input type="range" id="int-slider" min="1" max="4" step="1" value="2"
+                  oninput="sliderChange('intensity', parseInt(this.value), 'int-display', v => ['','Light','Moderate','Intense','Maximum'][v])" />
+                <div class="slider-minmax"><span>Light</span><span>Moderate</span><span>Intense</span><span>Max</span></div>
+              </div>
+              <div class="slider-block">
+                <div class="slider-top">
+                  <div>
+                    <div class="slider-big" id="rec-display">Average</div>
+                    <div class="slider-unit-label">RECOVERY ABILITY</div>
+                  </div>
+                </div>
+                <input type="range" id="rec-slider" min="1" max="4" step="1" value="2"
+                  oninput="sliderChange('recovery', parseInt(this.value), 'rec-display', v => ['','Poor','Average','Good','Excellent'][v])" />
+                <div class="slider-minmax"><span>Poor</span><span>Average</span><span>Good</span><span>Excellent</span></div>
+              </div>
+              <div class="nav-btns">
+                <button class="btn btn-ghost" onclick="nextStep(3)">← Back</button>
+                <button class="btn btn-primary" onclick="nextStep(5)">Next →</button>
+              </div>
+            </div>
+
+            <!-- Step 5: Goal -->
+            <div class="step-panel" id="step-5">
+              <div class="step-badge">Step 06 / 06</div>
+              <h2 class="step-heading">YOUR GOAL</h2>
+              <p class="step-desc">What are you ultimately training for? This shapes rep ranges, rest periods, and exercise selection.</p>
+              <div class="card-row">
+                <div class="card-opt" onclick="selectOpt(5,'goal','strength',this)">
+                  <div class="card-opt-icon">💪</div>
+                  <div class="card-opt-title">Strength</div>
+                  <div class="card-opt-desc">Maximize lifts. Heavy, low-rep compound work.</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(5,'goal','hypertrophy',this)">
+                  <div class="card-opt-icon">📐</div>
+                  <div class="card-opt-title">Hypertrophy</div>
+                  <div class="card-opt-desc">Build muscle mass. Moderate reps and high volume.</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(5,'goal','endurance',this)">
+                  <div class="card-opt-icon">🏃</div>
+                  <div class="card-opt-title">Endurance</div>
+                  <div class="card-opt-desc">High reps, conditioning, shorter rest.</div>
+                </div>
+                <div class="card-opt" onclick="selectOpt(5,'goal','general',this)">
+                  <div class="card-opt-icon">⚖️</div>
+                  <div class="card-opt-title">General Fitness</div>
+                  <div class="card-opt-desc">Balanced health, performance, and mobility.</div>
+                </div>
+              </div>
+              <div class="nav-btns">
+                <button class="btn btn-ghost" onclick="nextStep(4)">← Back</button>
+                <button class="btn btn-primary" id="btn-5" onclick="runGenerate()" disabled>Generate Plan →</button>
+              </div>
+            </div>
+
+          </div><!-- /gen-content -->
+
+          <!-- Plan Output (hidden until generated) -->
+          <div id="plan-output" style="display:none">
+            <div class="plan-header-bar" id="planHeaderBar"></div>
+            <div class="plan-body">
+              <div class="week-grid" id="weekGrid"></div>
+              <div class="fatigue-section">
+                <div class="section-heading">Muscle Fatigue Tracker</div>
+                <div class="fatigue-grid" id="fatigueGrid"></div>
+              </div>
+              <div style="margin-top:32px; display:flex; gap:12px;">
+                <button class="btn btn-ghost" onclick="resetGenerate()">← Rebuild Plan</button>
+                <button class="btn btn-primary" onclick="logAllWorkouts()">Log Workouts &amp; Update Fatigue</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right column -->
+      </div><!-- /gen-layout -->
+    </div><!-- /page-generate -->
+
+    <!-- DAILY PAGE -->
+    <div id="page-daily" class="page">
+      <div class="daily-wrap">
+        <div class="daily-top">
+          <div>
+            <div class="daily-badge">Global Daily Workout</div>
+            <div class="daily-title">TODAY'S<br>GRIND</div>
+            <div class="daily-date" id="dailyDateLabel"></div>
+          </div>
+          <div class="streak-card">
+            <div class="streak-fire">🔥</div>
+            <div class="streak-num" id="streakNum">0</div>
+            <div class="streak-label">Day Streak</div>
+            <div class="streak-days" id="streakDays"></div>
+          </div>
+        </div>
+        <div class="daily-card" id="dailyCard"></div>
+      </div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div id="page-history" class="page">
+      <div class="history-wrap">
+        <div class="hist-title">HISTORY</div>
+        <div class="hist-sub">Your logged workouts and training record.</div>
+        <div id="histList"></div>
+      </div>
+    </div>
+
+  </main><!-- /main -->
+
+  <!-- Scripts — order matters -->
+  <script src="js/db.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
